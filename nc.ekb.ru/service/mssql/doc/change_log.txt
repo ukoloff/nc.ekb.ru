@@ -1,0 +1,34 @@
+CHANGELOG
+
+Things to do in a long time :
+- Export
+- Import from a csv text file
+- Users
+- Triggers
+- Stored procedures
+- Views
+- Server status & options
+
+Things to do in a short time :
+- Ask a confirmation for DROP and DELETE
+- SELECT : order in other way
+- DELETE / EDIT multiple rows
+- ADD COLUMN 
+- SELECT : LIMIT, TOP
+
+
+Bug :
+urldecode / urlencode
+
+v0.1 -- 15/02/2004 ------------------------------
+New features
+- CREATE TABLE : add new table with fields & primary keys
+- ALTER TABLE  : modify date type, length, null
+- DROP TABLE   : ok
+- EMPTY TABLE  : ok
+- VIEW DATA    : select *, order
+- UPDATE DATA  : modify a record (only if the pkey is int)
+- DELETE DATA  : delete record (only if the pkey is int)
+
+Bux fixes
+- no bugs : project start

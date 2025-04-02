@@ -1,0 +1,46 @@
+
+Div.Paper {
+    width: 100%;
+    margin: 0;
+    background: white;
+    border: 1px solid black;
+    padding: 1em;
+    padding-left: 3em;
+}
+
+Span.Empty {
+    width: 100%;
+    border-bottom: 1px solid black;
+}
+
+Span.Comment {
+    background: yellow;
+    color: navy;
+    font-size: 90%;
+    border-bottom: 1px dotted navy;
+}
+
+TD.Limit {
+    background: #A0C0F0;
+    border: 2px ridge;
+}
+
+TD.Free {
+    background: #CCFFCC;
+}
+TD.Payed {
+    background: #FFFFCC;
+}
+TD.Ban {
+    background: #FFCCCC;
+}
+TD.Axis {
+    border-bottom: 1px solid black;
+}
+TD.#Limits {
+    border: solid black;
+    border-width: 0 1 1 1;
+}
+TR.Axis {
+    line-height: 50%;
+}

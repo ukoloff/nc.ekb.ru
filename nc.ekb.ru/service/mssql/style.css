@@ -1,0 +1,91 @@
+body {  
+    background: #FFFFFF;
+    color: #000000;
+}  
+
+body, a, td, th, b {
+    font-size: 10px; font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif, monospace;
+}
+
+a:link {    
+    color: #0000FF;    
+    background: transparent;
+    text-decoration: none;
+}    
+    
+a:visited {    
+    color: #0000FF;    
+    background: transparent;
+    text-decoration: none;
+}    
+    
+a:active {    
+    color: #000000;    
+    background: #ADD8E6;
+    text-decoration: none;
+}    
+
+h1 {
+    color: #990033; text-size: 20; 
+}
+h2 {
+    color: #000000; text-size: 16; 
+}
+
+img {
+    border: 0px;
+}
+
+TH {
+	backgroud-color: #0000FF; font-size: 12px; color: #000000; font-weight: bold;
+}
+
+.banner, .banner A {
+	font-size: 12px; font-color: #FFFFFF; font-weight: normal;
+}
+
+TD.connect_header {
+	color: #FFFFFF; font-size: 12px; font-weight: bold;
+}
+
+.connect_loginBox {
+	width: 180px;
+	height: 20px;
+	border: 1px solid #000000;
+}
+
+.connect_button {
+	width: 40 px;
+	height: 18px;
+	border: 1px solid black;
+	background-color: #F7F7EF;
+}
+
+.select_base {
+	height: 16px;
+	font-size: 10px;
+}
+
+.select_base SELECT {
+	height: 16px;
+	font-size: 10px;
+}
+
+.dataTable {
+	border: 1px solid;
+	padding: 0px;
+}
+.dataTable TD {
+	border-right: 1px solid #CCCCCC;
+	border-bottom: 1px solid #CCCCCC;
+}
+.dataTable TH {
+	background-color: #CCCCCC;
+	border-left: 1px solid #FFFFFF;
+	border-right: 1px solid #000000;
+	border-bottom: 1px solid #000000;
+}
+
+CODE {
+	background-color: #CCCCCC;
+}

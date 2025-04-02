@@ -1,0 +1,208 @@
+[/omz/]
+text=Сетевой центр
+parent=
+defaultParent
+title=Вернуться на первую страницу сайта
+;status=Возвращает Вас на первую страницу сайта
+;target=_blank
+
+[/omz/?logout]
+text=Войти снова
+if=$Auth
+title=Сменить имя, под которым Вы находитесь на сайте
+
+[/omz/?login]
+text=Войти
+if=!$Auth
+
+[/omz/me/]
+text=Обо мне
+
+[/omz/me/?x=pass]
+if=$Auth
+text=Сменить пароль
+
+[/omz/me/?x=remind&i=+]
+text=Напомнить
+if=0 & @"#browseDIT"
+title=Вернуться на эту страницу в указанное Вами время
+
+[/omz/service/rdp/]
+text=Терминал
+if=0 & @RDP
+
+[https://srvmail-ekbh5.omzglobal.com/owa/]
+text=Электронная почта
+if=1 | !$Auth
+
+[/omz/me/?x=owa]
+text=Электронная почта
+if=0 & $Auth
+
+[/omz/service/video/]
+text=Видеонаблюдение
+if=0 & @"Video@uxm"
+
+[/omz/me/cacti/]
+text=Cacti
+title=Система мониторинга
+if=0 & @"cacti@uxm"
+
+[/omz/service/directum/]
+text=@Directum
+if=@"#modifyDIT"|@"Support"
+title=Список пользователей, подключившихся к СЭД Директум
+
+[/omz/service/nwlock]
+text=@Netware
+if=0 & (@"#modifyDIT" | @"progs@nw")
+
+[/omz/service/sigur/]
+text=Экспорт из Sigur
+#if="s.ukolov1" | "s.ukolov"
+
+[/omz/service/sgr/]
+parent=/omz/service/sigur/
+text=Sigur.dev
+if="s.ukolov1" | "s.ukolov"
+
+[/omz/service/sgr/monthly/]
+parent=/omz/service/sigur/
+text=Месяц
+if="s.ukolov1" | "s.ukolov"
+
+[/omz/dc/]
+text=Домен
+parent=
+if=$Auth & @"#browseDIT"
+
+[/omz/dc/db/]
+text=Внешние БД
+title=Поиск пользователей по другим базам данных
+if=@"#browseDIT"
+parent=/omz/dc/
+
+[https://srvlnk-ekbh1.omzglobal.com/Cscp/]
+text=Lync
+title=Администрирование сервера Lync
+if=$intraNet & stas
+parent=/omz/dc/
+
+[/omz/service/mig/]
+text=Мигранты
+title=Список юзверей, предназначенных для миграции в ОМЗ
+parent=/omz/dc/
+#if=$Auth & @"#browseDIT"
+if=0
+
+[/omz/service/fortune/]
+text=Ориджины
+if=stas | "s.ukolov" | "s.ukolov1"
+parent=/omz/dc/
+
+[/omz/service/inet/]
+text=Канал Тырнета
+#if=@"#modifyDIT"
+if=0
+parent=/omz/dc/
+
+[/dc/]
+text=Домен uxm
+parent=
+if=0 & $Auth & @"#browseDIT"
+
+[/omz/abook/]
+text=Адресная книга
+parent=
+title=Поиск пользователей в адресной книге ОМЗ
+#if=$Auth | $intraNet
+if=0
+
+[/omz/abook/pki/]
+text=PKI
+title=Инфраструктура открытых ключей (ЭЦП и т.п.)
+parent=/omz/abook/
+#if=@'CA@uxm'
+if=0
+
+[http://ekb.ru/ssl/]
+text=Certs+CRLs
+parent=/omz/abook/pki/
+if=stas
+
+[/omz/abook/users.ca/]
+text=#Old
+parent=/omz/abook/pki/
+if=0&stas
+
+[/omz/stat/]
+text=Статистика
+parent=
+#if=$Auth
+if=0
+title=Просмотр статистики доступа в Интернет
+
+[/omz/stat/host]
+text=Компьютеры
+#if=@"#Statistics"
+if=0
+parent=/omz/stat/
+title=Просмотр входов на определенный компьютер
+
+[/omz/stat/?list]
+text=Список
+#if=@"#Statistics"
+if=0
+parent=/omz/stat/
+title=Просмотр статистики всех пользователей
+
+[/omz/help/]
+text=Справка
+parent=
+#if=stas
+if=0
+
+[http://sd.ekb.ru]
+text=Техподдержка
+parent=
+#parent=/omz/help/
+
+[/kb/]
+text=База Знаний
+parent=http://sd.ekb.ru
+
+[https://pbx.ekb.ru/ldap/]
+text=Адресная книга
+parent=http://sd.ekb.ru
+
+[/omz/service/clock/]
+text=Время
+parent=/omz/
+
+[http://portal.ekb.ru/]
+text=Portal.ekb.ru
+if=0
+parent=
+defaultParent
+title=Портал &laquo;Уралхиммаш&raquo;
+
+[https://omz.tech/]
+text=ОМЗ
+parent=
+defaultParent
+title=Официальный сайт &laquo;ОМЗ&raquo;
+
+[https://uralhimmash.ru/]
+text=ОАО &laquo;Уралхиммаш&raquo;
+parent=
+defaultParent
+title=Официальный сайт ОАО &laquo;Уралхиммаш&raquo;
+
+[http://www.uxm/files/]
+text=Файловый архив
+if=0 & $intraNet
+
+[http://updates.uxm/nod3x/]
+text=Базы NOD32
+if=0 & $intraNet
+title=Укажите этот адрес программе автоматического обновления антивируса NOD32 (v3/4)

@@ -1,0 +1,259 @@
+<html>
+<head>
+<title>Массовое задание паролей локального пользователя
+</title>
+<HTA:APPLICATION
+    ID="htaSetPass"
+    ApplicationName="SetPass"
+    Icon="/favicon.ico"
+/>
+<Style>
+body	{
+    background: #A0C0E0;
+    color:black;
+    font-family: Verdana, Arial, sans-serif;
+    padding: 0.5ex;
+    text-align: justify;
+}
+H1	{
+    text-align: right;
+    margin: 1ex;
+}
+
+</Style>
+<Script>
+
+if(!document.all || !document.all.htaSetPass || !document.all.htaSetPass.sysMenu)
+ location='SetPass.hta';
+
+var HostList={
+ 'Серверы': 'dbServ hpServer Omega Sko Directum Prophix',
+ 'Виртуальные машины': 'Ricoh1035 EIPP IsProX',
+ 'Рабочие станции': 'Stas NB',
+ 'Контроллеры домена': 'fServer xServer DC-DB DC-R2 DC-Omega DC-HP DC-Directum'
+};
+
+function Populate()
+{
+ for(var i in HostList)
+ {
+  var Z=new Option;
+  Z.value=Z.text=i;
+  document.all.Lists.add(Z);
+ }
+}
+
+function addHosts()
+{
+ var A=document.all.Lists.value;
+ document.all.Lists.value='';
+ if(!A) return;
+ A=HostList[A];
+
+ var H=document.all.Hosts;
+ if(H.value)A="\n"+A;
+ H.value+=A+"\n";
+}
+
+function Update(Msg)
+{
+ var B=document.all.Run;
+
+ var Z=(' '+document.all.Hosts.value).split(/\s+/);
+ document.all.HN.innerText=Z.length;
+ if(!Z.length)
+ {
+  B.disabled=1;
+  if(Msg)
+  {
+   document.all.Hosts.focus();  
+   alert("Хосты не заданы");
+  }
+  return;
+ }
+
+ var re=/^\w+$/;
+ for(var i=0; i<Z.length; i++)
+ {
+  if(re.test(Z[i])) continue;
+  B.disabled=1;
+  if(Msg)
+  {
+   document.all.Hosts.focus();  
+   alert("Недопустимый хост: "+Z[i]);
+  }
+  return;
+ }
+
+ if(!re.test(document.all.User.value))
+ {
+  B.disabled=1;
+  if(Msg)
+  {
+   document.all.User.focus();  
+   alert("Неверное имя пользователя");
+  }
+  return;
+ }
+
+ var p=document.all.Pass.value;
+ if(p!=document.all.Pass2.value)
+ {
+  B.disabled=1;
+  if(Msg)
+  {
+   document.all.Pass.focus();  
+   alert("Пароли не совпадают");
+  }
+  return;
+ }
+
+ if(!p.length)
+ {
+  B.disabled=1;
+  if(Msg)
+  {
+   document.all.Pass.focus();  
+   alert("Пароль не задан");
+  }
+  return;
+ }
+
+ B.disabled=0;
+ if(Msg) return Z;
+}
+
+function Run()
+{
+ var H=Update(1);
+ if(!H) return;
+
+ var u=document.all.User.value;
+ var S='';
+ for(var i=0; i<H.length; i++)
+ {
+  S+="<LI>"+H[i]+"\\"+u+" <Span id='L"+i+"'></Span>";
+ }
+ document.all.Log.innerHTML=S;
+
+ var Z=window.Z;
+ Z.Hosts=H;
+ Z.User=u;
+ Z.Pass=document.all.Pass.value;
+ Z.i=-1;
+ doStart();
+}
+
+function StopIt()
+{
+ window.Z.Stop=1;
+ doStop();
+}
+
+function Stopped()
+{
+ return window.Z.Stop;
+}
+
+function doStop()
+{
+ var Z=window.Z;
+ if(!Z)
+  Z=window.Z=new Object;
+ else
+ {
+  var B=document.all.Run;
+  B.value=window.Z.btnCaption;
+  B.onclick=window.Z.btnAction;
+ }
+ Z.iUpdate=setInterval(Update, 300);
+}
+
+function doStart()
+{
+ window.Z.Stop=0;
+ clearInterval(window.Z.iUpdate);
+
+ var B=document.all.Run;
+ window.Z.btnCaption=B.value;
+ window.Z.btnAction=B.onclick;
+
+ B.value=' Стоп! ';
+ B.onclick=StopIt;
+ 
+ NextHost();
+}
+
+function NextHost()
+{
+ if(Stopped()) return;
+ var Z=window.Z;
+ if(++(Z.i)>=Z.Hosts.length)
+  doStop();
+ else
+  setTimeout(doSay, 1);
+}
+
+function doSay()
+{
+ if(Stopped()) return;
+ document.all.Log.all['L'+window.Z.i].innerText='Соединяюсь...';
+ setTimeout(doConnect, 1);
+}
+
+function doConnect()
+{
+ if(Stopped()) return;
+ var Z=window.Z;
+ var e;
+ try{Z.ADs=GetObject("WinNT://"+Z.Hosts[Z.i]+"/"+Z.User);}catch(e){Z.ADs=null;}
+ document.all.Log.all['L'+Z.i].innerText=Z.ADs? 'Меняю пароль...' : 'Не найден';
+ if(Z.ADs)
+  setTimeout(doPass, 1)
+ else
+  NextHost();
+}
+
+function doPass()
+{
+ if(Stopped()) return;
+ var Z=window.Z;
+ var e;
+ try{Z.ADs.SetPassword(Z.Pass);}catch(e){e=1;}
+ document.all.Log.all['L'+Z.i].innerText=e? 'Ошибка' : 'Ok';
+ NextHost();
+}
+
+doStop();
+
+</Script>
+</head>
+<body onLoad='Populate()'>
+<H1>Установка пароля
+</H1>
+<Table Width='100%'>
+<TR vAlign='top'><TD Width='100%' RowSpan="2">
+<Label For="Hosts">Хосты</Label>
+<Select id='Lists' onChange='addHosts()'>
+ <Option Value=''>Добавить в список...
+</Select>
+<BR />
+<TextArea id="Hosts" Rows="10" Cols="40" Style='width: 100%;' >
+</TextArea><BR />
+<Small>Хостов: <Span id="HN"></Span></Small>
+</TD><TD>
+<Label For="User">Пользователь</Label><BR />
+<Input Type="Text" id="User" Value="root" /><BR />
+<Label For="Pass">Новый пароль</Label><BR />
+<Input Type="Password" id="Pass" /><BR />
+<Input Type="Password" id="Pass2" />
+</TD></TR><TR><TD vAlign="Bottom">
+<Input Type="Button" id="Run" Style="width: 100%;" Value=" Задать "
+    onClick="Run()" Disabled />
+</TD></TR></Table>
+<HR />
+<Div id="Log">
+</Div>
+
+</body>
+</html>

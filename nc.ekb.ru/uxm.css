@@ -1,0 +1,217 @@
+body {
+    background: #A0C0E0;
+    margin: 0;
+    margin-left: 8em;
+    color:black;
+    font-family: Verdana, Arial, sans-serif;
+    padding: 0.5ex;
+    text-align: justify;
+}
+
+.menuSmart {
+    position: absolute;
+    top:0;
+    left: 0;
+    background: silver;
+    font-size: 90%;
+}
+
+.menuDumb {
+    background: silver;
+    layer-background-color: silver;
+}
+
+A:link {	color: blue; }
+A:visited {	color: purple; }
+A:active {	color: red; }
+A:hover {	color: red; }
+
+H1 {
+	text-align: right;
+	margin: 0;
+}
+
+H2 {
+	margin: 0;
+}
+
+.error {
+	text-align: center;
+	x-color: navy;
+	background: red;
+	border: 1 solid yellow;
+}
+
+.itemError {
+	color: red;
+	font-size: 80%;
+}
+
+A.menuLink	{
+    text-decoration: none;
+}
+A.menuLink:link {	color: black; }
+A.menuLink:visited {	color: black; }
+A.menuLink:hover {	color: blue; }
+A.menuLink:active {	color: blue; }
+
+.menuItem {
+    border: 1px solid;
+    border-color: white gray gray white;
+    background: silver;
+}
+
+.menuItemX {
+    border: 1px solid #DDDDDD;
+    x-border-color: gray white white gray;
+    background: #DDDDDD;
+}
+
+.menuSpacer	{
+    padding-left: 1.5ex;
+    font-size: 90%;
+}
+
+Table.Tabs {
+	border: none;
+	width: 100%;
+	position: relative;
+}
+
+Table.Tabs TD.Active {
+	background: #B0D0F0;
+	border: solid black;
+	border-width: 1px 1px 0;
+	padding: 0 1ex;
+	font-weight: bold;
+	text-align: center;
+}
+
+Table.Tabs TD.Passive {
+	background: #A0C0F0;
+	border: 1px solid black;
+	padding: 0 1ex;
+	text-align: center;
+}
+
+Table.Tabs TD.Passive Div {
+ position: relative;
+}
+
+Table.Tabs TD.Passive Div Div {
+ position: absolute;
+ top: 0;
+ display: none;
+ text-align: left;
+ font-size: 112%;
+ padding: 0.3ex;
+ border: 2px ridge;
+ background: #A0F0C0;
+ z-index: 3;
+}
+
+Table.Tabs TD.Passive Div.Left Div {
+ left: 0;
+}
+
+Table.Tabs TD.Passive Div.Right Div {
+ right: 0;
+}
+
+Table.Tabs TD.Empty {
+	border-bottom: 1px solid black;
+}
+
+Table.Tabs TD.EOL {
+	width: 100%;
+	border-bottom: 1px solid black;
+}
+
+Table.Tabs TD.Page {
+	background: #B0D0F0;
+	height: 20em;
+	border: solid black;
+	border-width: 0 1px 1px;
+	padding: 1ex;
+}
+
+Table.Tabs TR.Tabs A {
+	text-decoration: none;
+	font-size: 80%;
+}
+
+A.Sort {
+	text-decoration: none;
+	font-size: 80%;
+}
+
+TR.tHeader {
+	background: white;
+}
+
+.PageNav {
+	text-align: center;
+	font-size: 90%;
+	padding: 1px;
+	background: #A0C0F0;
+}
+
+.PageNav A {
+	text-decoration: none;
+	padding: 0 0.3ex;
+}
+
+.PageNav A.Thumb {
+	border: 1px solid gray;
+	background: silver;
+}
+
+img.userThumb	{
+    position: absolute;
+    right: 1ex;
+    border: 2px ridge;
+}
+
+img.Draggable	{
+    position: absolute;
+    z-index: 2;
+    border: 2px ridge;
+    cursor: move;
+}
+
+img.Draggable.dragging	{
+    border-style: groove;
+    cursor: pointer;
+}
+
+wbr {
+ display: inline-block;
+}
+
+.userReminder {
+ position: fixed;
+ top: 0;
+ right: 0;
+ background: yellow;
+ border: 3px double navy;
+ font-size: 75%;
+}
+
+* html .userReminder {
+ position: absolute;
+}
+
+.userReminder A {
+ text-decoration: none;
+ color: red;
+}
+
+@media print {
+#Menu {
+    display: none;
+}
+body {
+    margin: 0;
+    background: none;
+}
+}

@@ -1,0 +1,30 @@
+<?php
+
+function transliterate($st) {
+                               
+  $st = strtr($st, 
+
+    "àáâãäåçèêëìíîïðñòóôûÀÁÂÃÄÅÇÈÊËÌÍÎÏÐÑÒÓÔÛ",
+
+    "abvgdeziklmnoprstufyABVGDEZIKLMNOPRSTUFY"
+
+  );
+
+  $st = strtr($st, array(
+
+    'é'=>"y",    'ý'=>"e",  'É'=>"Y",  'Ý'=>"E",  'æ'=>"zh", 'Æ'=>"Zh",
+
+    '¸'=>"yo",    'õ'=>"kh",  'ö'=>"ts",  '÷'=>"ch", 'ø'=>"sh",  
+
+    'ù'=>"shch",  'ú'=>'',   'ü'=>'',    'þ'=>"yu", 'ÿ'=>"ya",
+
+    '¨'=>"Yo",    'Õ'=>"Kh",  'Ö'=>"Ts",  '×'=>"Ch", 'Ø'=>"Sh",
+
+    'Ù'=>"Shch",  'Ú'=>'',   'Ü'=>'',    'Þ'=>"Yu", 'ß'=>"Ya",
+
+  ));
+
+  return $st;
+
+}
+?>

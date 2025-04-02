@@ -1,0 +1,10 @@
+Redirect / https://ekb.ru/omz/
+#AuthType Basic
+#AuthName MySQL
+#require group sql
+require user stas pavel
+#php3_magic_quotes_gpc on
+
+#order allow,deny
+#allow from 192.168
+#allow from ekb.ru

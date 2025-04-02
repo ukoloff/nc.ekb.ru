@@ -1,0 +1,36 @@
+Div.Comment {
+    font-size: 90%;
+    margin-left: 2em;
+    margin-bottom: 1ex;
+}
+
+Legend {
+    font-size: 95%;
+}
+
+Div.Result {
+    font-size: 127%;
+    text-align: center;
+    background: #B0D0F0;
+    border: 2px groove;
+}
+
+Table.kbd {
+    border: none;
+}
+
+Table.kbd TD {
+    border: 1 outset;
+    font-size: 85%;
+    width: 2.3em;
+}
+
+TD Div.ru {
+    text-align: right;
+    color: red;
+}
+
+TD Div.en {
+    text-align: left;
+    color: navy;
+}

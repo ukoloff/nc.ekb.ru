@@ -1,0 +1,23 @@
+REGEDIT4
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\W32Time]
+"Start"=dword:00000002
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\W32Time\Parameters]
+"Period"="SpecialSkew"
+"type"="NTP"
+"ntpserver"="ekb.ru"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\DateTime\Servers]
+@="1"
+"1"="ekb.ru"
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\W32Time\TimeProviders\NtpClient]
+"Enabled"=dword:00000001
+"SpecialPollInterval"=dword:00000e10
+
+[HKEY_USERS\.DEFAULT\Control Panel\Desktop]
+"ScreenSaveActive"="1"
+"ScreenSaverIsSecure"="1"
+"SCRNSAVE.EXE"="C:\\WINDOWS\\system32\\scrnsave.scr"
+"ScreenSaveTimeOut"="300"

@@ -1,0 +1,15 @@
+Content-type: text/html
+X-Powered-By: PHP/4.3.4
+
+Dup: bta	Клименко Ю.А.
+Dup: brs	Товстая О.И.
+Dup: beu	Михайлова Т.А.
+Dup: oit	Ростик И.И.
+Dup: koreshkov	Корешков Н.В.
+Dup: carwiz	Уколов С.С.
+Dup: burova	Бурова С.В.
+Dup: klimenko	Клименко Ю.А.
+Dup: romashkina	Ромашкина Н.В.
+
+Creating asu...
+Creating service...

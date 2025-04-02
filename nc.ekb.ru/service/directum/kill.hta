@@ -1,0 +1,249 @@
+<html><head>
+<title>Активные пользователи Directum
+</title>
+<HTA:APPLICATION
+	ID="htaDirectum"
+	ApplicationName="DirectumUsers"
+/>
+<Style>
+body	{
+	background: #A0C0E0;
+	color:black;
+	font-family: Verdana, Arial, sans-serif;
+	padding: 0;
+	text-align: justify;
+}
+H1      {
+	text-align: right;
+	margin: 1ex;
+}
+Div#Users	{
+	text-align: center;
+}
+Div#Copyright {
+	margin-top: 1ex;
+	font: 62%;
+}
+TR.Head	{
+	background: white;
+}
+TR.Even	{
+	background: #AAAAAA;
+}
+TR.Odd	{
+	background: #CCCCCC;
+}
+A.Sort	{
+	text-decoration: none;
+}
+
+</Style>
+<Script><!--
+var Server='Directum';
+
+var Fields=[
+	{c:'№', title:'Порядковый номер'},
+	{c:'Хост', title:'Имя компьютера'},
+	{c:'Пользователь'},
+	{c:'База', title:'База данных Directum'},
+	{c:'Соединений', title:'Открыто соединений с SQL-сервером', sort:1}
+];
+var Sort=[{n:1}];
+
+var All=[];
+
+function trim(S)
+{
+ return (new String(S)).replace(/\s+$/, '');
+}
+
+function html(S)
+{
+ S=''+S;
+ var E={'&':'amp', '>':'gt', '<':'lt', '"':'quot'};
+ for(var Z in E)
+   S=S.split(Z).join('&'+E[Z]+';');
+ return S;
+}
+
+function WWW(a)
+{
+ a.blur();
+ var x=new ActiveXObject("WScript.Shell");
+ x.run(a.href);
+ return false;
+}
+
+function getHeader()
+{
+ var R='<TR Class="Head">';
+ for(n in Fields)
+ {
+  var F=Fields[n];
+  R+='<TH';
+  if(F.title)R+=' Title="'+html(F.title)+'"';
+  R+='>'+html(F.c);
+  if(0!=n)
+  {
+   var Pos=0;
+   var Title;
+   for(var i in Sort)
+    if(Sort[i].n==n)
+    {
+     Pos=i;
+     break;
+    }
+   if(Pos)
+   {
+    if(Sort[Pos].Desc)
+    {
+     Title='Отсортировано в порядке убывания';
+     if(0==Pos)
+       Pos='&laquo;';
+     else
+     {
+      Title+='\nПозиция: '+(Number(Pos)+1);
+      Pos='&lsaquo;';
+     }
+    }
+    else
+    {
+     Title='Отсортировано в порядке возрастания';
+     if(0==Pos)
+       Pos='&raquo;';
+     else
+     {
+       Title+='\nПозиция: '+(Number(Pos)+1);
+       Pos='&rsaquo;';
+     }
+    }
+   }
+   else
+   {
+    Pos='&rsaquo;&lsaquo;';
+    Title='Не отсортировано';
+   }
+   R+='<A Class="Sort" hRef="#" onClick="onSort('+n
+	+'); return false" Title="'+Title+'">'+Pos+'</A>';
+  }
+  R+='</TH>';
+ }
+ return R+'</TR>';
+}
+
+function orderBy()
+{
+ var R=' Order By ';
+ for(var i in Sort)
+ {
+  var Z=Sort[i];
+  if(0!=i) R+=', ';
+  R+=Z.n;
+  if(Z.Desc) R+=' Desc';
+ }
+ return R;
+}
+
+function allowADO()
+{
+ var X=new ActiveXObject("WScript.Shell");
+ X.RegWrite("HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings\\Zones\\1\\1406",
+	0, "REG_DWORD");
+// 0 - Разрешить, 1 - Спрашивать, 3 - Запретить
+}
+
+function getUsers()
+{
+ var C=new ActiveXObject('ADODB.Connection');
+ C.Provider='SQLOLEDB';
+ C.Open("Integrated Security=SSPI;Data Source="+Server);
+
+ var S=C.Execute("Select "+
+" hostname, loginame, "+
+" (Select name From sysdatabases Where dbid=sysprocesses.dbid) As DB, count(*) As N "+
+"From sysprocesses "+
+"Where program_name='IS-Builder' "+
+"And loginame<>'ISBuilderSystem' "+
+"Group by hostname, loginame, dbid "+orderBy());
+ var R="<Table Border CellSpacing='0' Width='100%'>"+getHeader();
+ All.length=0;
+ while(!S.EOF)
+ {
+  var Rec={h:trim(S('hostname')), u:trim(S('loginame')), d:''+S('DB'), n:0+S('N')};
+  All.push(Rec);
+  R+='<TR Class="'+(All.length&1? 'Even':'Odd')
+	+'"><TD Align="Right"><A hRef="#" Title="Разорвать" onClick="Drop('+(All.length-1)
+	+'); return false">'+All.length+'</A></TD><TD>'+html(Rec.h)+'</TD><TD>'+html(Rec.u)
+	+'</TD><TD>'+html(Rec.d)+'</TD><TD Align="Right">'+Rec.n+'</TD></TR>';
+  S.MoveNext();
+ }
+ Users.innerHTML=R+"</Table>";
+}
+
+function onSort(n)
+{
+ if(Sort[0].n==n)
+  Sort[0].Desc=!Sort[0].Desc;
+ else
+ {
+  var Old=Sort;
+  Sort=[{n:n, Desc:Fields[n].sort}];
+  var z;
+  while(z=Old.shift())
+    if(z.n!=n)
+      Sort.push(z);
+ }
+ getUsers();
+}
+
+function Drop(N)
+{
+ var Z=All[N];
+ if(!Z) return;
+// alert('Обрыв #'+N);
+ if(!confirm('Вы точно хотите оборвать все соединения пользователя "'+Z.u
+	+'"\nс компьютера "'+Z.h+'"?')) return;
+ if(confirm('А может всё таки передумаете и смените гнев на милость?\n\n'+
+'Напоминаем, что принудительный обрыв соединений может приводить\n'+
+'к серьёзным потерям данных, с которыми работал пользователь.')) return;
+ doDrop(Z);
+ getUsers();
+}
+
+function doDrop(Rec)
+{
+ var Procs={'sbrte.exe':0, 'sbsce.exe':0, 'sblogon.exe':0};
+
+ for(var i in Procs) Procs[i]={n:0};
+
+ var Z=GetObject("winmgmts:\\\\"+Rec.h+"\\root\\cimv2");
+ for(var E=new Enumerator(Z.ExecQuery("Select * from Win32_Process Where Name Like 'sb%'")); 
+	!E.atEnd(); E.moveNext())
+ {
+  var P=E.item();
+  var Q=Procs[P.Name];
+  if(!Q) continue;
+  var R=P.ExecMethod_("GetOwner");
+  if(R.Domain+"\\"+R.User!=Rec.u) continue;
+  Q.n++;
+//  alert(P.CommandLine);
+ P.Terminate();
+ }
+ var S='Обнаружено процессов:';
+ for(var i in Procs)
+   S+='\n'+i+':\t'+Procs[i].n;
+ alert(S);
+}
+
+allowADO();
+
+//--></Script>
+</head><body onLoad='getUsers()'>
+<H1>Активные пользователи Directum
+</H1>
+<Div id='Users'>
+Подождите, идёт загрузка списка пользователей...
+</Div>
+<Div id='Copyright'><HR />&copy; ОАО &laquo;<A
+hRef='http://ekb.ru' onClick='return WWW(this)'>Уралхиммаш</A>&raquo;, 2008</Div>
+</body></html>

@@ -1,0 +1,8 @@
+[/dc/sendmail/aliases/]
+text=Пересылка
+
+[/dc/sendmail/access/]
+text=Доступ
+
+[/dc/sendmail/classes/]
+text=Классы

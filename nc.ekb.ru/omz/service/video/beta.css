@@ -1,0 +1,51 @@
+body.iBoss	{
+    background: white;
+}
+
+x.thumb	{
+    border: none;
+    margin: 1px;
+}
+span.thumb	{
+    display: inline-block;
+    border: 3px solid #DEDEDE;
+    x-background: #EEEEEE;
+    margin: 1px;
+    font-size: 80%;
+}
+span.thumb A	{
+    text-decoration: none;
+    color: navy;
+}
+span.thumb img	{
+    border: none;
+}
+span.thumb div	{
+    width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+FieldSet	{
+    padding: 0;
+    border: 1px solid gray;
+}
+FieldSet Legend A	{
+    text-decoration: none;
+}
+div.setup	{
+    text-align: left;
+    border-top: 2px groove;
+}
+div.setup2	{
+    text-align: left;
+    border-bottom: 1px solid gray;
+}
+div#-divC	{
+    display:	none;
+}
+div#-divC A	{
+    text-decoration: none;
+}
+img#preview	{
+    border: 2px ridge;
+}

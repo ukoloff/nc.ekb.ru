@@ -1,0 +1,364 @@
+#!/usr/bin/perl
+
+use strict;
+
+use DBI;
+use Socket;
+use Net::Ping;
+use Net::SNMP;
+use File::Basename;
+
+$|=1;
+$ENV{PATH}='/bin/';
+delete @ENV{'IFS', 'CDPATH', 'ENV', 'BASH_ENV'};
+
+my $time=time;
+
+my %Cache;
+
+if(not -t STDOUT)
+{
+ open STDOUT, '>', '/dev/null';
+ open STDERR, '>', '/dev/null';
+}
+
+# open STDOUT, '>', '/var/tmp/out'; open STDERR, '>', '/var/tmp/err';
+
+my $h=DBI->connect('dbi:SQLite:'.dirname($0).'/../data/main.db');
+$h->{RaiseError}=1;
+
+# Загрузим из БД список проверяемых коммутаторов
+my $s=$h->prepare('Select * From Switch Where Disabled Is Null Order By Pri');
+$s->execute;
+my $sw=$s->fetchall_arrayref({});
+
+die "Nothing to do!\n"	unless scalar @$sw;
+
+startLog();
+
+getInfo($sw);
+$Cache{ARP}=getSystemARP();
+
+print '[+', time()-$time, '] First querying of ARP tables: ';
+getARP($sw);
+print "\n[+", time()-$time, "] Pinging hosts...\n";
+doPings($sw);
+print "[+", time()-$time, '] Querying switch address tables: ';
+getPorts($sw);
+print "\n[+", time()-$time, '] Second querying of ARP tables: ';
+getARP($sw);
+
+print "\n[+", time()-$time, "] Storing data to database...\n";
+finishLog();
+
+storeInfo($sw);
+storePorts($sw);
+storeAllARP($sw);
+
+$h->commit;
+$h->{AutoCommit}=1;
+$h->do('VACUUM');
+
+print "[+", time()-$time, "] Done!\n";
+
+# Пометить данные полученные по SNMP или из файла как "чистые", чтобы их можно было положить в БД
+sub unTaint
+{
+ my %X;
+ $X{shift()}=0;
+ return (keys %X)[0];
+}
+
+# Обойдём все коммутаторы и получим с них общую информацию (название, описание...)
+sub getInfo
+{
+ my $sw=shift;
+
+ my $snmpInfo={
+    Descr=>'1.3.6.1.2.1.1.1.0', 
+    Contact=>'1.3.6.1.2.1.1.4.0', 
+    Name=>'1.3.6.1.2.1.1.5.0',
+    Location=>'1.3.6.1.2.1.1.6.0',
+ };
+ foreach my $z(@$sw)
+ {
+  $z->{SNMP}=Net::SNMP->session(
+    -hostname=>$z->{Host}, 
+    -nonblocking=>1,
+    -community=>'public',
+    -retries=>1,
+    -timeout=>10,
+#    -translate=>[-octetstring=>0],
+    )
+    or next;
+  $z->{SNMP}->get_request(
+    -varbindlist=>[values %$snmpInfo],
+    -callback=>[\&switchInfo, $z, $snmpInfo]
+    )	or	delete($z->{SNMP});
+ }
+ Net::SNMP::snmp_dispatcher();
+}
+
+# Получение контактной информации с 1 коммутатора
+sub switchInfo
+{
+ my ($s, $z, $v)=@_;
+ return	if $s->error;
+
+ my $resp=$s->var_bind_list;
+ $z->{Info}={IP=>inet_ntoa(inet_aton($z->{Host}))};
+ while(my($k, $v)=each %$v)
+ {
+  $z->{Info}{$k}=unTaint($resp->{$v});
+ }
+}
+
+# Получить таблицы ARP со всех коммутаторов
+sub getARP
+{
+ my $sw=shift;
+ foreach my $z(@$sw)
+ {
+  next	unless $z->{SNMP};
+  $z->{SNMP}->get_table(
+    -baseoid=>'1.3.6.1.2.1.4.22.1.2',
+    -callback=>[\&switchARP, $z],
+    );
+ }
+ Net::SNMP::snmp_dispatcher();
+}
+
+# Получение таблицы ARP с 1 коммутатора
+sub switchARP
+{
+ my ($s, $z)=@_;
+ return	if $s->error;
+ my $resp=$s->var_bind_list;
+ $z->{ARP}=[];
+ while(my($k, $v)=each %$resp)
+ {
+  my $mac=unTaint($v);
+  $mac=~s/^0x//;
+  $mac=~s/(.{2})/$1:/g;
+  $mac=~s/:$//;
+  push @{$z->{ARP}}, {ip=>join('.', (split /\./, $k)[11..14]), mac=>$mac}
+ }
+ print $z->{Host}, '[', scalar(@{$z->{ARP}}), '] ';
+}
+
+# Получить разMACовку со всех коммутаторов
+sub getPorts
+{
+ my $sw=shift;
+ foreach my $z(@$sw)
+ {
+  next	unless $z->{SNMP};
+  $z->{SNMP}->get_table(
+    -baseoid=>'1.3.6.1.2.1.17.4.3.1.2', # 1.3.6.1.2.1.17.7.1.2.2.1.2 //Q-BRIDGE
+    -callback=>[\&switchPorts, $z],
+    );
+ }
+ Net::SNMP::snmp_dispatcher();
+}
+
+# Получение разMACовку с 1 коммутатора
+sub switchPorts
+{
+ my ($s, $z)=@_;
+ return	if $s->error;
+ my $resp=$s->var_bind_list;
+ $z->{Ports}={};
+ while(my($k, $v)=each %$resp)
+ {
+  $z->{Ports}{join ':', map(sprintf('%02x', $_), (split(/\./, $k))[11..16])}=unTaint($v);
+ }
+ print $z->{Host}, '[', scalar(keys %{$z->{Ports}}), '] ';
+}
+
+# Пропинговать как можно больше хостов
+sub doPings
+{
+ my $sw=shift;
+ my %IPs;
+ my %broadCast;
+ foreach my $z(@$sw)
+ {
+  next	unless $z->{ARP};
+  foreach my $a(@{$z->{ARP}})
+  {
+   $a->{mac}.':' eq 'ff:' x 6 ?
+    ($broadCast{$a->{ip}}=1) :
+    ($IPs{$a->{ip}}=1);
+  }
+  delete($z->{ARP});
+ }
+ foreach my $ip(keys %broadCast)
+ {	# Пингуем широковещательные адреса
+  system qw(/bin/ping -qbc 1), $ip;
+ }
+ my $ping=Net::Ping->new("icmp", 0.01);
+ foreach my $ip(keys %IPs)
+ {	# Пингуем индивидуальные хосты
+  $ping->ping($ip);
+ }
+}
+
+# Найти номер, которым помечен IP-адрес
+sub findIP
+{
+ my $ip=shift;
+ return	unless $ip;
+ return $Cache{IP}->{$ip}	if $Cache{IP}->{$ip};
+
+ my $s=$Cache{sqlFindIP}||=$h->prepare("Select No From IPs Where IP=?");
+ $s->execute($ip);
+ my $n=($s->fetchrow_array)[0];
+ $s->finish;
+ if($n)
+ {
+  $s=$Cache{sqlUseIP}||=$h->prepare("Update IPs Set Last=? Where No=?");
+  $s->execute(time, $n);
+  return $n;
+ }
+ $s=$Cache{sqlNewIP}||=$h->prepare("Insert Into IPs(IP, First, Last) Values(?, ?, ?)");
+ $s->execute($ip, time, time);
+ return $h->func('last_insert_rowid');
+}
+
+# Найти номер, которым помечен MAC-адрес
+sub findMac
+{
+ my $mac=shift;
+ return	unless $mac;
+ return $Cache{Mac}->{$mac}	if $Cache{Mac}->{$mac};
+
+ my $s=$Cache{sqlFindMac}||=$h->prepare("Select No From MACs Where MAC=?");
+ $s->execute($mac);
+ my $n=($s->fetchrow_array)[0];
+ $s->finish;
+ if($n)
+ {
+  $s=$Cache{sqlUseMac}||=$h->prepare("Update MACs Set Last=? Where No=?");
+  $s->execute(time, $n);
+  return $n;
+ }
+ $s=$Cache{sqlNewMac}||=$h->prepare("Insert Into MACs(MAC, First, Last) Values(?, ?, ?)");
+ $s->execute($mac, time, time);
+ return $h->func('last_insert_rowid');
+}
+
+# Сохранить контактную информацию о коммутаторах
+sub storeInfo
+{
+ my $sw=shift;
+
+ $h->do("Delete From SwInfo");
+ my $s=$h->prepare("Insert Into SwInfo(No, IP, Name, Location, Contact, Descr) Values(?, ?, ?, ?, ?, ?)");
+ foreach my $z(@$sw)
+ {
+  next	unless $z->{Info};
+  $s->execute(
+    $z->{No},
+    findIP($z->{Info}{IP}),
+    $z->{Info}{Name},
+    $z->{Info}{Location},
+    $z->{Info}{Contact},
+    $z->{Info}{Descr},
+    );
+ }
+}
+
+# Сохранить разMACовку всех коммутаторов
+sub storePorts
+{
+ my $sw=shift;
+
+ $h->do("Delete From Comm");
+ my $s=$h->prepare("Insert Into Comm(Sw, Port, MAC) Values(?, ?, ?)");
+ foreach my $z(@$sw)
+ {
+  next	unless $z->{Ports};
+  while(my($mac, $port)=each %{$z->{Ports}})
+  {
+   $s->execute(
+    $z->{No},
+    $port,
+    findMac($mac),
+    );
+  }
+ }
+}
+
+# Получить системную таблицу ARP
+sub getSystemARP
+{
+ my $res=[];
+ open(ARP, '<', "/proc/net/arp");
+ while(my $s=<ARP>)
+ {
+  my ($ip, $hw, $flags, $mac, $mask, $dev)=split /\s+/, $s;
+  next
+    unless $hw eq '0x1'
+    and	$flags eq '0x2';
+  push @$res, {ip=>unTaint($ip), mac=>lc(unTaint($mac))};
+ }
+ close(ARP);
+ return $res;
+}
+
+# Сохранить 1 ARP-таблицу
+sub storeARP
+{
+ my $a=shift;
+ return	unless $a;
+ my $s=$Cache{sqlAddARP}||=$h->prepare("Insert Or Ignore Into ARP(MAC, IP) Values(?, ?)");
+
+ foreach my $z(@$a)
+ {
+  $s->execute(findMac($z->{mac}), findIP($z->{ip}))
+    unless $z->{mac}.':' eq 'ff:'x6;
+ }
+}
+
+# Сохранить все ARP-таблицы коммутаторов и системную тоже
+sub storeAllARP
+{
+ my $sw=shift;
+
+ $h->do("Delete From ARP");
+ storeARP($Cache{ARP});
+ foreach my $z(@$sw)
+ {
+  storeARP($z->{ARP});
+ }
+}
+
+# Отмечаем в журнале старт программы
+sub startLog
+{
+# Сначала обойдём все (якобы) запущенные процессы
+ my $s=$h->prepare("Select * From Run Where Status=0");
+ $s->execute();
+ my %X;
+ $s->bind_columns(\( @X{ @{$s->{NAME}} }));
+ while($s->fetch)
+ {
+  die "Data is already beeing gathered by process #$X{PID}! Wait...\n"	if -d '/proc/'.$X{PID};
+ }
+ $h->do("Update Run Set Status=-1 Where Status=0");
+ $h->do("Insert Into Run(PID) Values(?)", undef, $$);
+ $Cache{logNo}=$h->func('last_insert_rowid');
+}
+
+sub finishLog
+{
+ my $s=$h->prepare("Select Status From Run Where No=?");
+ $s->execute($Cache{logNo});
+ die "Process marked as dead...\n"	if ($s->fetchrow_array)[0];
+ $s=$h->prepare("Update Run Set Status=1, Time=(julianDay('now')-julianDay(Start))*86400 Where No=?");
+ $s->execute($Cache{logNo});
+
+ $h->{AutoCommit}=0;
+}
+
+__END__

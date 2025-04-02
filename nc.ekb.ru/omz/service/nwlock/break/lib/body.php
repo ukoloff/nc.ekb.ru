@@ -1,0 +1,1 @@
+<? LoadLib('POST'==$_SERVER['REQUEST_METHOD']?'break':'warn'); ?>

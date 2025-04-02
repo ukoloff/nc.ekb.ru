@@ -1,0 +1,15 @@
+!@#$%^
+
+Replace Into Migrate(u, cn, ou, description, info) Values('gal', 'Загумённая Г.А.', 'ОИТ/Загумённая Г.А.', 'Загумённая Галина', '');
+Replace Into Migrate(u, cn, ou, description, info) Values('larisa', 'Салихова Л.', 'ОИТ/Салихова Л.', 'САПР', '');
+Replace Into Migrate(u, cn, ou, description, info) Values('stas', 'Уколов С.С.', 'ОИТ/Уколов С.С.', 'Системный администратор', '');
+Replace Into Migrate(u, cn, ou, description, info) Values('atpp', 'Калинин А.В.', 'ОИТ/Калинин А.В.', 'Оба проекта', '');
+Replace Into Migrate(u, cn, ou, description, info) Values('pavel', 'Колобов Павел', 'ОИТ/Колобов Павел', 'Работа с конструкторами', '');
+Replace Into Migrate(u, cn, ou, description, info) Values('rdm', 'Яцына Р.Д.', 'ОИТ/Программисты/Яцына Р.Д.', '', '');
+Replace Into Migrate(u, cn, ou, description, info) Values('tim', 'Тимофеева Л.', 'ОИТ/Программисты/Тимофеева Л.', 'Тимофеева Людмила', '');
+Replace Into Migrate(u, cn, ou, description, info) Values('tanya', 'Усова Т.А.', 'ОИТ/Программисты/Усова Т.А.', '', '');
+Replace Into Migrate(u, cn, ou, description, info) Values('san', 'Дунаев А.А.', 'ОИТ/Дунаев А.А.', '', '');
+Replace Into Migrate(u, cn, ou, description, info) Values('igla', 'Иголкина Н.В.', 'ОИТ/Иголкина Н.В.', 'Иголкина Наталья Васильевна', '');
+Replace Into Migrate(u, cn, ou, description, info) Values('spm', 'spm', 'ОИТ/Операторы/spm', '146б', '');
+Replace Into Migrate(u, cn, ou, description, info) Values('koresh', 'Корешков Н.В.', 'ИУ/Корешков Н.В.', '', '');
+Replace Into Migrate(u, cn, ou, description, info) Values('zmey', 'Уколов С.С.', 'Внешние/Модем/Уколов С.С.', '', '');

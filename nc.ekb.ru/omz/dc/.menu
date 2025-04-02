@@ -1,0 +1,25 @@
+[/omz/dc/host/free/]
+text=uxmNNNNN
+#if=stas
+
+[/omz/dc/dns/]
+text=DNS
+#if=stas
+
+[/omz/dc/bgp/]
+text=BGP
+#if=@"#modifyDIT"
+if=0
+
+[/omz/service/mysql/]
+text=MySQL
+if=@"#modifyDIT"|@Support
+
+[/omz/service/adminer/]
+text=Adminer
+if=stas
+
+[/omz/service/ticket/]
+text=Билеты@WiFi
+if=@"#modifyDIT"
+if = 0

@@ -1,0 +1,3 @@
+<Div Style='text-align: center; background: yellow; padding: 1ex; border: 1px dotted red;'>
+Для входа на эту страницу Вам необходимо <A hRef='/omz/?login'>зарегистрироваться</A> в системе...
+</Div>

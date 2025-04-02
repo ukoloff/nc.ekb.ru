@@ -1,0 +1,138 @@
+[/]
+text=Сетевой центр
+parent=
+defaultParent
+title=Вернуться на первую страницу сайта
+;status=Возвращает Вас на первую страницу сайта
+;target=_blank
+
+[/?logout]
+text=Войти снова
+if=$strongAuth
+title=Сменить имя, под которым Вы находитесь на сайте
+
+[/?login]
+text=Войти
+if=!$strongAuth
+
+[/me/?x=pass]
+text=Сменить пароль
+title=Изменить Ваш пароль на доступ к электронной почте и Интернет
+
+[/mail/]
+text=Электронная почта
+title=Вы можете читать свою электронную почту при помощи Веб-браузера, без почтовой программы
+
+[/service/fortune/]
+text=Ориджины
+if=stas
+
+[/service/mysql/]
+text=MySQL
+if=stas|pavel
+
+[/service/pg/]
+text=PostgreSQL
+if=0&stas
+
+[/gui/]
+#if=stas
+if=0
+text=uTorrent
+
+[/service/ts/]
+if=@Administrators | @Support
+text=Терминал
+
+[/service/inet/]
+if=@Administrators 
+text=Канал Тырнета
+
+[/dc/]
+text=Домен
+parent=
+if=$strongAuth & !$legacyAuth & @"#browseDIT"
+
+[/omz/dc/]
+text=Домен ОМЗ
+parent=
+if=@"#browseDIT"
+
+[/help/]
+text=Сведения
+parent=
+defaultParent
+
+[/me/]
+text=Обо мне
+
+[/service/nwlock]
+text=Занятые файлы
+if=@"#browseDIT" | @"progs@nw"
+
+[/service/directum]
+text=Кто в Directum
+if=@"Domain Admins"|@"Support"
+
+[/help/inet/]
+text=Регламент Internet
+if=$intraNet
+
+[/help/dial/]
+text=Настройка dialup
+if=0
+
+[/server-info]
+text=Server Info
+if=stas
+
+[/server-status]
+text=Server Status
+if=stas
+
+[/help/cert/]
+text=Сертификат
+if=
+
+[/abook/]
+text=Адресная книга
+parent=
+title=Поиск пользователей в адресной книге локальной сети
+if=$Auth | $intraNet
+
+[/stat/]
+text=Статистика
+parent=
+#if=$Auth
+title=Просмотр статистики доступа в Интернет и к электронной почте
+
+[http://ekb.ru]
+text=ОАО &laquo;Уралхиммаш&raquo;
+parent=
+defaultParent
+title=Официальный сайт ОАО &laquo;Уралхиммаш&raquo;
+
+[http://www.uxm]
+text=Интранет
+#if=$intraNet
+if=0
+
+[http://www.uxm/files/]
+text=Файловый архив
+if=$intraNet
+
+[http://arh.uxm/files/]
+text=Файловый архив 2
+if=$intraNet
+if=0
+
+[http://updates.uxm/nod3x/]
+text=Базы NOD32
+if=$intraNet
+title=Укажите этот адрес программе автоматического обновления антивируса NOD32 (v3/4)
+
+[http://avp.uxm]
+text=Базы AVP
+if=$intraNet
+if=0
+title=Укажите этот адрес программе автоматического обновления антивируса Касперского AVP/KAV

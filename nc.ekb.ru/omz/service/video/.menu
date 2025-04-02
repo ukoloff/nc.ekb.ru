@@ -1,0 +1,22 @@
+[http://video.ekb.ru]
+text=Для внешних
+
+[/omz/service/video/?auth]
+text=Новая авторизация
+if=0;stas
+
+[/omz/service/video/hash/]
+text=Расчёт пароля
+if=0&stas
+
+[/omz/dc/group/?x=list&g=Video@uxm]
+text=Доступ
+if=@"#modifyDIT"
+
+[/omz/dc/group/?x=list&g=VideoDispatcher@uxm]
+text=Диспетчеры
+if=@"#modifyDIT"
+
+[/omz/service/video/admin/]
+text=Порулить!
+if=$Dispatcher

@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+use strict;
+
+use DBI;
+
+my $h=DBI->connect('dbi:SQLite:../data/main.db');
+
+print "X...\n";
+$h->do("Delete From CrossX");
+$h->do(<<SQL);
+Insert Into CrossX(SA, PA, SB, PB)
+Select Distinct C1.SW, C1.Port, C2.SW, C2.Port
+From Comm C1, Comm C2 
+Where C1.MAC=C2.Mac
+    And C1.Sw<>C2.Sw
+SQL
+
+print "Y...\n";
+$h->do("Delete From CrossY");
+$h->do(<<SQL);
+Insert Into CrossY(No, Sw, Port)
+Select S.No, Comm.Sw, Comm.Port
+From SwInfo As S, ARP, Comm
+Where S.IP=ARP.ip And ARP.Mac=Comm.Mac
+SQL
+
+print "Z...\n";
+$h->do("Delete From CrossZ");
+$h->do(<<SQL);
+Insert Into CrossZ(SA, PA, SB, PB)
+Select * 
+From CrossX As X
+Where Not Exists(Select * From CrossY As Y Where Y.No=X.SA And Y.Sw=X.SB And Y.Port=X.PB)
+    And Not Exists(Select * From CrossY As Y Where Y.No=X.SB And Y.Sw=X.SA And Y.Port=X.PA)
+SQL
+
+__END__

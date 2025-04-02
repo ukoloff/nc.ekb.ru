@@ -1,0 +1,9 @@
+.path {
+    text-align: left;
+    x-font-size: 110%;
+    background: #A0C0F0;
+}
+
+.path A {
+    text-decoration: none;
+}

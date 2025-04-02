@@ -1,0 +1,171 @@
+ZUP20
+-----
+
+Уколов:
+dbo._Document810_VT15292._Fld15296
+dbo._Reference562._Fld41471
+dbo._InfoRg26996._Fld26998
+dbo._InfoRgSL27006._Fld26998
+
+Ведущий системный администратор
+dbo._Reference499._Description
+dbo._Document810_VT15307._Fld15334
+dbo._InfoRg25787._Fld25790
+dbo._Reference395._Description
+dbo._InfoRg25301._Fld25309_S
+dbo._InfoRg22399._Fld22422
+dbo._InfoRg22433._Fld22439
+dbo._Reference137._Description
+dbo._InfoRg26291._Fld26299
+
+13099
+dbo._Reference562._Code			// Работник
+dbo.InfoRg20399._Fld20421
+dbo._Reference458._Code			// AD User
+
+
+Select * from _InfoRg26291
+where _Fld26292RRef in(
+    select _IDRRef from _Reference562 Where _Code='13099')
+
+
+DECLARE @search VARCHAR(100), @table SYSNAME, @column SYSNAME
+
+DECLARE curTabCol CURSOR FOR
+    SELECT c.TABLE_SCHEMA + '.' + c.TABLE_NAME, c.COLUMN_NAME
+    FROM INFORMATION_SCHEMA.COLUMNS c
+    JOIN INFORMATION_SCHEMA.TABLES t 
+      ON t.TABLE_NAME=c.TABLE_NAME AND t.TABLE_TYPE='BASE TABLE' -- avoid views
+    WHERE c.DATA_TYPE IN ('varchar','nvarchar', 'char', 'nchar') -- searching only in these column types
+    --AND c.COLUMN_NAME IN ('NAME','DESCRIPTION') -- searching only in these column names
+
+SET @search='13099'
+
+OPEN curTabCol
+FETCH NEXT FROM curTabCol INTO @table, @column
+
+WHILE (@@FETCH_STATUS = 0)
+BEGIN
+    EXECUTE('IF EXISTS 
+             (SELECT * FROM ' + @table + ' WHERE ' + @column + ' = ''' + @search + ''') 
+             PRINT ''' + @table + '.' + @column + '''')
+    FETCH NEXT FROM curTabCol INTO @table, @column
+END
+
+CLOSE curTabCol
+DEALLOCATE curTabCol
+
+
+0xAC2300155D275C0011EEE2B472B67DF2 (_IDRRef where _Code='13099' from _Reference562)
+dbo._AccumRg27170._Fld27172RRef
+dbo._AccumRg27348._Fld27350RRef
+dbo._AccumRg27422._Fld27435RRef
+dbo._AccumRg27463._Fld27464RRef
+dbo._AccumRg27620._Fld27624RRef
+dbo._AccumRg27732._Fld27734RRef
+dbo._AccumRg27831._Fld27833RRef
+dbo._AccumRg27958._Fld27960RRef
+dbo._AccumRg28312._Fld28314RRef
+dbo._AccumRg28372._Fld28374RRef
+dbo._AccumRg28424._Fld28426RRef
+dbo._AccumRg28479._Fld28481RRef
+dbo._AccumRgT27182._Fld27172RRef
+dbo._AccumRgT27361._Fld27350RRef
+dbo._AccumRgT27639._Fld27624RRef
+dbo._AccumRgT28339._Fld28314RRef
+dbo._CRg42358._Fld42360RRef
+dbo._Document662_VT4974X1._Fld4976RRef
+dbo._Document683_VT6628X1._Fld6630RRef
+dbo._Document692_VT7274._Fld7276RRef
+dbo._Document692_VT7352._Fld7354RRef
+dbo._Document692_VT7387._Fld7389RRef
+dbo._Document719._Fld9809RRef
+dbo._Document770._Fld12718RRef
+dbo._Document810_VT15292._Fld15294RRef
+dbo._Document810_VT15307._Fld15309RRef
+dbo._Document810_VT15342._Fld15344RRef
+dbo._Document839_VT17988._Fld17990RRef
+dbo._InfoRg20090._Fld20093RRef
+dbo._InfoRg20098._Fld20103RRef
+dbo._InfoRg20129._Fld20130RRef
+dbo._InfoRg20158._Fld20159RRef
+dbo._InfoRg20280._Fld20281RRef
+dbo._InfoRg20362._Fld20363_RRRef
+dbo._InfoRg20399._Fld20402RRef
+dbo._InfoRg20433._Fld20435RRef
+dbo._InfoRg20491._Fld20492RRef
+dbo._InfoRg20694._Fld20695_RRRef
+dbo._InfoRg20817._Fld20820RRef
+dbo._InfoRg20827._Fld20832RRef
+dbo._InfoRg20903._Fld20905RRef
+dbo._InfoRg20909._Fld20910RRef
+dbo._InfoRg21270._Fld21273RRef
+dbo._InfoRg21283._Fld21288RRef
+dbo._InfoRg21560._Fld21563RRef
+dbo._InfoRg21570._Fld21574RRef
+dbo._InfoRg21832._Fld21834RRef
+dbo._InfoRg21986._Fld22000RRef
+dbo._InfoRg22039._Fld22042RRef
+dbo._InfoRg22063._Fld22068RRef
+dbo._InfoRg22336._Fld22337RRef
+dbo._InfoRg22399._Fld22400RRef
+dbo._InfoRg22583._Fld22584RRef
+dbo._InfoRg22592._Fld22593_RRRef
+dbo._InfoRg23563._Fld23565RRef
+dbo._InfoRg23583._Fld23585RRef
+dbo._InfoRg23993._Fld23995RRef
+dbo._InfoRg24135._Fld24137RRef
+dbo._InfoRg24301._Fld24303RRef
+dbo._InfoRg24311._Fld24315RRef
+dbo._InfoRg24386._Fld24389RRef
+dbo._InfoRg24399._Fld24404RRef
+dbo._InfoRg24471._Fld24473RRef
+dbo._InfoRg24495._Fld24500RRef
+dbo._InfoRg24516._Fld24521RRef
+dbo._InfoRg24664._Fld24666RRef
+dbo._InfoRg24714._Fld24716RRef
+dbo._InfoRg25121._Fld25122RRef
+dbo._InfoRg25491._Fld25492RRef
+dbo._InfoRg25498._Fld25500RRef
+dbo._InfoRg25613._Fld25614RRef
+dbo._InfoRg25694._Fld25698_RRRef
+dbo._InfoRg25787._Fld25789_RRRef
+dbo._InfoRg25928._Fld25930RRef
+dbo._InfoRg25973._Fld25974RRef
+dbo._InfoRg26150._Fld26151RRef
+dbo._InfoRg26226._Fld26227RRef
+dbo._InfoRg26230._Fld26231RRef
+dbo._InfoRg26247._Fld26248RRef
+dbo._InfoRg26291._Fld26292RRef
+dbo._InfoRg26351._Fld26352RRef
+dbo._InfoRg26363._Fld26364RRef
+dbo._InfoRg26467._Fld26468RRef
+dbo._InfoRg26989._Fld26991RRef
+dbo._InfoRg26996._Fld26997_RRRef
+dbo._InfoRg54093._Fld54094_RRRef
+dbo._InfoRg54657._Fld54666RRef
+dbo._InfoRg58063X1._Fld58065_RRRef
+dbo._InfoRgSL20442._Fld20435RRef
+dbo._InfoRgSL20825._Fld20820RRef
+dbo._InfoRgSL27006._Fld26997_RRRef
+dbo._Reference250._OwnerIDRRef				// ОбразованиеФизическихЛиц
+dbo._Reference428._OwnerIDRRef				// РодственникиФизическихЛиц
+dbo._Reference458._Fld39756RRef				// Сотрудники
+dbo._Reference562._IDRRef				// ФизическиеЛица
+dbo._Reference562_VT41476._Reference562_IDRRef		// ФизическиеЛица.КонтактнаяИнформация
+dbo._Reference563._Fld41552RRef				// ПрисоединенныеФайлы
+
+
+_Reference562 where _Code='13099'
+_IDRRef	_Version	_Marked	_PredefinedID	_ParentIDRRef	_Folder	_Code	_Description	_Fld41457	_Fld41458RRef	_Fld41459	_Fld41460	_Fld41461	_Fld41462RRef	_Fld41463	_Fld41464	_Fld41465	_Fld41466	_Fld41467	_Fld41468	_Fld41469RRef	_Fld48018RRef	_Fld48019RRef	_Fld41470	_Fld41471	_Fld41472	_Fld41473	_Fld41474	_Fld41475	_Fld54821	_Fld58962	_Fld58963	_Fld58964	_Fld1375
+0xAC2300155D275C0011EEE2B472B67DF2	0x00000000007AD60B	0x00	0x00000000000000000000000000000000	0x00000000000000000000000000000000	0x01	13099	Уколов Станислав Сергеевич	3971-07-08 00:00:00	0xA5BA88039F4BFE3C463072DC5545798F	667405604449	023-171-201 89	0,г. Свердловск,,,	0x00000000000000000000000000000000	0x00	0x00	Уколов Станислав Сергеевич		3987-08-05 00:00:00	УКОЛОВ СТАНИСЛАВ СЕЁРГЕЁЕЁВИЧ	0x00000000000000000000000000000000	0x8B10188D2BDB7AE84142A59DB789A8EB	0x00000000000000000000000000000000	0x00	Уколов	Станислав	Сергеевич	С. С.		0x00	0x00	0x00	0x00	0
+
+_Reference458 where _Code='13099'
+_IDRRef	_Version	_Marked	_PredefinedID	_Code	_Description	_Fld39756RRef	_Fld39757RRef	_Fld39758	_Fld39759	_Fld39760	_Fld39761RRef	_Fld39762	_Fld45804	_Fld45805	_Fld45806	_Fld1375
+0xAC2300155D275C0011EEE2B52C47E589	0x00000000007AF0F0	0x00	0x00000000000000000000000000000000	13099	Уколов Станислав Сергеевич	0xAC2300155D275C0011EEE2B472B67DF2	0x97EE000CF17FB96D11DDD290CEFA3F6F	0.00	0x00		0xAC2300155D275C0011EEE2B52C47E589	0x00	NF8mTQ5h	0x01	s.ukolov	0
+
+0x97EE000CF17FB96D11DDD290CEFA3F6F (_Reference458._Fld39757RRef)
+dbo._Reference265._IDRRef	// Организации
+
+0xAC2300155D275C0011EEE2B52C47E589	(_Reference458._Fld39761RRef)
+dbo._Reference458._IDRRef		(Self?!)

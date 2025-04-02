@@ -1,0 +1,107 @@
+#!/usr/bin/perl
+#
+# Включение/выключение блока за превышение квоты
+#
+
+use strict;
+use DBI;
+use Net::LDAP;
+
+my $groupName='\(squid\)';
+
+my $ldapUser='squidOperator@lan.uxm';
+my $ldapPass='C%=UArs=w2{nD{ipy8at9Z860';
+my $sqlUser='sop';
+my $sqlPass='mer3k7bv';
+
+my $dbh=DBI->connect("DBI:mysql:uxm", $sqlUser, $sqlPass);
+my $sth=$dbh->prepare(<<SQL);
+Select UT.u, limitMb
+From uTotals UT, limits L
+Where UT.u=L.u And UT.b>limitMb*1024*1024
+    And UT.`When`=Date_Format(Now(), '%Y%m')
+    And limitMb>0
+SQL
+$sth->execute();
+my %Over;
+while(my $r=$sth->fetchrow_hashref)
+{
+ $Over{$r->{u}}=$r->{limitMb};
+}
+$sth->finish();
+$dbh->disconnect();
+
+my @URI;
+open(F, '/etc/ldap.conf');
+while(<F>)
+{
+ next	unless s/^\s*URI\s+//i;
+ s/\s+$//;
+ @URI=split;
+ last;
+}
+close(F);
+
+my $h=Net::LDAP->new(\@URI, onerror=>'die');
+$h->bind($ldapUser, password=>$ldapPass);
+my $q=$h->search(filter=>"objectClass=*", scope=>'base');
+my $Base=$q->entry(0)->get_value('defaultNamingContext');
+$q=$h->search(base=>$Base, filter=>"(&(sAMAccountName=$groupName)(objectClass=Group))", attrs=>['member']);
+$q=$q->entry(0);
+my $gdn=$q->dn();
+foreach my $dn($q->get_value('member'))
+{
+ $q=$h->search(base=>$dn, scope=>'base', filter=>"(&(sAMAccountName=*)(objectClass=User))", attrs=>['sAMAccountName']);
+ next	unless 1==$q->count();
+ my $u=$q->entry(0)->get_value('sAMAccountName');
+ if(defined($Over{$u}))
+ {
+  delete($Over{$u});
+ }
+ else
+ {
+#  print "On: $u\n";
+  $h->modify($gdn, delete=>{'member'=>$dn});
+  eMail($u, "Блокировка за превышение квоты доступа в Интернет снята.");
+ }
+}
+
+my $N=0;
+foreach my $u(sort keys %Over)
+{
+ my $uu=$u;
+ $uu=~s/[\(\*\)\\]/\\$&/g;
+ $q=$h->search(base=>$Base, filter=>"(&(sAMAccountName=$uu)(objectClass=User))", attrs=>[]);
+ next	unless 1==$q->count();
+# print "Off: $u\t$Over{$u}\n";
+ my $dn=$q->entry(0)->dn();
+ $h->modify($gdn, add=>{'member'=>$dn});
+ eMail($u, "Доступ в Интернет заблокирован до конца месяца за превышение квоты $Over{$u} Мегабайт.")
+ $N++;
+}
+
+# Пусть squid сразу выбросит перебравших
+exec qw(/usr/sbin/squid -k reconfigure)	if $N;
+
+sub eMail
+{
+ my $To=shift;
+ my $Body=shift;
+ 
+ open(SENDMAIL, "|-") or exec qw(/usr/lib/sendmail -oi -odq -N never stas);# , $To;
+ print SENDMAIL<<"EOF";
+From: =?Windows-1251?B?0ejx8uXs7fvpIODk7Ojt6PHy8ODy7vA=?= <root\@ekb.ru>
+To: $To
+MIME-Version: 1.0
+Content-Type: text/plain; charset=windows-1251
+Subject: =?Windows-1251?B?xO7x8vPvIOIgyO3y5fDt5fI=?=
+
+$Body
+
+Статистика доступа в Интернет http://net.ekb.ru/stat/
+
+EOF
+ close(SENDMAIL);
+}
+
+#--[EOF]---------------------------------------------------------

@@ -1,0 +1,17 @@
+Div.winPath	{
+    text-align:	left;
+    font-size:	90%;
+    background:	#A0C0F0;
+}
+
+Span.Ajax {
+    font-size: 87%;
+    margin-left: 1ex;
+    color: navy;
+}
+
+Div#Notify {
+    display: none;
+    font-size: 75%;
+    margin-left: 2em;
+}

@@ -1,0 +1,9 @@
+DirectoryIndex		/omz/index.php
+#ErrorDocument 400	/omz/error.php
+#ErrorDocument 401	/omz/error.php
+#ErrorDocument 402	/omz/error.php
+#ErrorDocument 403	/omz/error.php
+#ErrorDocument 404	/omz/error.php
+#ErrorDocument 500	/omz/error.php
+
+#php_flag	asp_tags off

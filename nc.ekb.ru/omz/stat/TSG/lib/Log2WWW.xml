@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Date>2012-09-03T16:20:41.9356073</Date>
+    <Author>OMZGLOBAL\stas</Author>
+  </RegistrationInfo>
+  <Triggers>
+    <EventTrigger>
+      <Enabled>true</Enabled>
+      <Subscription>&lt;QueryList&gt;&lt;Query Id="0" Path="Microsoft-Windows-TerminalServices-Gateway/Operational"&gt;&lt;Select Path="Microsoft-Windows-TerminalServices-Gateway/Operational"&gt;*[System[(EventID=302 or EventID=303)]]&lt;/Select&gt;&lt;/Query&gt;&lt;/QueryList&gt;</Subscription>
+      <ValueQueries>
+        <Value name="ID">Event/System/EventID</Value>
+        <Value name="IP">Event/UserData/EventInfo/IpAddress</Value>
+        <Value name="User">Event/UserData/EventInfo/Username</Value>
+        <Value name="Host">Event/UserData/EventInfo/Resource</Value>
+        <Value name="Time">Event/UserData/EventInfo/SessionDuration</Value>
+        <Value name="bIn">Event/UserData/EventInfo/BytesReceived</Value>
+        <Value name="bOut">Event/UserData/EventInfo/BytesTransfered</Value>
+      </ValueQueries>
+    </EventTrigger>
+  </Triggers>
+  <Principals>
+    <Principal id="Author">
+      <UserId>S-1-5-18</UserId>
+      <RunLevel>LeastPrivilege</RunLevel>
+    </Principal>
+  </Principals>
+  <Settings>
+    <MultipleInstancesPolicy>Queue</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <ExecutionTimeLimit>PT1H</ExecutionTimeLimit>
+  </Settings>
+  <Actions Context="Author">
+    <Exec>
+      <Command>C:\Users\Log2WWW\Log2WWW.js</Command>
+      <Arguments>id:"$(ID)" u:"$(User)" IP:"$(IP)" h:"$(Host)" t:"$(Time)" in:"$(bIn)" out:"$(bOut)"</Arguments>
+    </Exec>
+  </Actions>
+</Task>

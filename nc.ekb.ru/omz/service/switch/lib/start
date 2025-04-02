@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+use strict;
+use File::Basename;
+
+$::CFG{0}=unTaint($0);
+$0=basename($0);
+$::CFG{root}=dirname($::CFG{0});
+$|=1;
+
+$ENV{PATH}='/bin/';
+delete @ENV{'IFS', 'CDPATH', 'ENV', 'BASH_ENV'};
+
+Lib('DB');
+Lib('Read');
+
+# Пометить данные полученные по SNMP или из файла как "чистые", чтобы их можно было положить в БД
+sub unTaint
+{
+ my %X;
+ $X{shift()}=0;
+ return (keys %X)[0];
+}
+
+sub Lib
+{
+ my $f=shift;
+ require "$::CFG{root}/$f.pl" ;
+}
+
+
+__END__

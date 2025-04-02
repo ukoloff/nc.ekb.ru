@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+
+system qw(/bin/echo
+/usr/bin/smbclient //Omega/Test$ -U guest% -c
+), 'ls *; ls "Six Seven/*"';

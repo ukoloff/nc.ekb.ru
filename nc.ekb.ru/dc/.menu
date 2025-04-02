@@ -1,0 +1,15 @@
+[/dc/ext/]
+text=Внешние БД
+title=Поиск пользователей по другим базам данных
+
+#[/dc/pass/]
+#text=Миграция паролей
+#if=stas
+
+[/dc/mig/]
+text=Миграция
+#if=stas
+
+[/dc/sendmail/]
+text=Настройка почты
+if=stas

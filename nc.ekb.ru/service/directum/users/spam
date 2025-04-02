@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+use strict;
+
+use MIME::Base64;
+
+#
+# Рассылка письма всем пользователям по списку. Осторожно!!!
+#
+
+my $DoNotEmail;
+$DoNotEmail=1;
+
+my ($u, $cn);
+
+DoSpam();
+
+sub DoSpam
+{
+ open F, '<', 'list.txt';
+ while(my $S=<F>)
+ {
+  $S=~s/^\s+//; $S=~s/\s+$//;
+  ($u, $cn)=split /\s+/, $S, 2;
+  processUser();
+ }
+}
+
+sub str2hdr
+{
+ my $s=shift;
+ return "=?Windows-1251?B?".encode_base64($s, '')."?=";
+}
+
+sub processUser
+{
+ print STDERR ">>>$cn\t<$u\@ekb.ru>\n";
+# return;
+ $DoNotEmail or open(STDOUT, "|-") or exec qw(/usr/lib/sendmail -oi -odq -N never), $u;
+ printf <<EOT, str2hdr($cn), $u, str2hdr("Системный администратор"), str2hdr("Обновление Directum"), $^V;
+To: %s <%s\@ekb.ru>
+From: %s <root\@ekb.ru>
+Subject: %s
+X-Mailer: Perl v%vd
+EOT
+   print <<EOT;
+MIME-Version: 1.0
+Content-Type: text/plain; charset=Windows-1251
+Content-Transfer-Encoding: 8bit
+
+Здравствуйте, $cn!
+
+В понедельник, 8 декабря 2008 года с 8:00 будет производиться обновление системы
+электронного документооборота Directum с версии 4.5 до версии 4.5.1.
+
+В это время СЭД Directum работать не будет. Мы ожидаем, что первые пользователи смогут
+начать работу в новой версии СЭД Directum к обеду, и у большинства она станет работоспособной 
+в течение понедельника. 
+
+От Вас не требуется никаких действий, всё обновление программного обеспечения на Вашем компьютере
+должно произойти автоматически.
+
+Все действия, связанные с созданием документов, передачей на согласование, подпись, регистрацию 
+осуществлять иными программными средствами, либо на бумажном носителе с дальнейшем копированием 
+в СЭД после включения.  
+
+Приносим извинения за причинённые неудобства.
+EOT
+ $DoNotEmail or close STDOUT;
+
+}
+
+#---[EOF]---
