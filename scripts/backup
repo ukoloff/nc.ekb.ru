@@ -1,0 +1,7 @@
+#!/bin/sh
+
+cd `dirname $0`
+git fetch
+git add --all ..
+git commit -m "Automatic backup `date "+%F %T %:z"`"
+git push
