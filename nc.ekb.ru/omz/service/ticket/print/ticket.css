@@ -1,0 +1,25 @@
+body {
+ background: white;
+ margin: 0.5ex;
+ color:black;
+ font-family: Verdana, Arial, sans-serif;
+}
+
+H1 {
+ text-align: center;
+}
+
+#Cut {
+ border: 1px dashed black;
+}
+
+TH {
+ text-align: right;
+ font-size: 87%;
+}
+
+@media print {
+.noPrint {
+ display: none;
+}
+}

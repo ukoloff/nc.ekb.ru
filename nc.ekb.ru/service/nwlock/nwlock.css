@@ -1,0 +1,19 @@
+Div.Indent {
+    x-border: 1px solid black;
+    margin: 0;
+    padding: 0;
+    padding-left: 1em;
+    display: none;
+}
+Span.Q {
+    cursor: hand;
+    background: silver;
+    border: solid 1px black;
+    font-family: monospace;
+    font-size: 70%;
+    padding: 0 0.5ex;
+}
+A.Break {
+    text-decoration: none;
+    font-size: 78%;
+}

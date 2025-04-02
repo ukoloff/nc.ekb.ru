@@ -1,0 +1,28 @@
+proc main
+integer count = 0
+Again:
+waitfor "ogin" then DoUsername,
+"sword" then DoPassword,
+"Entering" then Done,
+"}" then Done,
+"%" then DoErr
+until 5
+transmit "^M"
+goto Again
+DoUsername: 
+transmit $USERID, raw
+transmit "^M"
+goto Again
+DoPassword:
+transmit $PASSWORD, raw
+transmit "^M"
+goto Again
+DoErr:
+count = count + 1
+if count >= 3 then
+set screen keyboard on
+halt
+endif
+goto Again
+Done:
+endproc

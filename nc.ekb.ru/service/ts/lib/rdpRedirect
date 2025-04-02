@@ -1,0 +1,104 @@
+#!/usr/bin/perl
+
+use strict;
+
+use DBI;
+use File::Basename;
+use IO::Socket;
+use IO::Select;
+#use POSIX 'setsid';
+
+if(not -t STDOUT)
+{
+ open STDOUT, '>', '/dev/null';
+ open STDERR, '>', '/dev/null';
+}
+
+die "Invalid parameter(s)!\n"	unless 1==scalar @ARGV;
+
+my $h=DBI->connect('dbi:SQLite:'.dirname($0).'/../data/data.db')	or die "Cannot connect to DB!\n";
+$h->{RaiseError}=1;
+my $stmt=$h->prepare("Select L.No, L.s, Z.tAccpt, Z.tData From Log As L, Z Where L.No=? And Z.No=L.No");
+$stmt->execute($ARGV[0]);
+my $Srv=$stmt->fetchrow_hashref	or	die "Record not found!\n";
+$stmt->finish;
+undef $stmt;
+
+my $Acc=IO::Socket::INET->new(Listen=>1);	#, Timeout=>$Srv->{tAccpt});
+#print "Listening on port ", $Acc->sockport, "\n";
+$h->do("Update Log Set Port=? Where No=?", undef, $Acc->sockport, $Srv->{No});
+
+fork	and exit;
+#setsid;
+
+my $s=IO::Select->new($Acc);
+my ($IN, $OUT, %Conn, $add);
+
+my %Conn;
+
+#while(my $IN=$Acc->accept())
+while(1)
+{
+ my @List=$s->can_read($IN? $Srv->{tData} : $Srv->{tAccpt} );
+ last	unless @List;
+ foreach my $z(@List)
+ {
+  if($z==$Acc)
+  {
+   #print "Accept\n";
+   if($IN)
+   {
+    $Acc->accept()->close();
+    next;
+   }
+   $IN=$Acc->accept();
+   $OUT=IO::Socket::INET->new(PeerAddr=>$Srv->{s}, PeerPort=>3389, Timeout=>5, ); #LocalHost=>'gt.ekb.ru');
+   if(!$OUT)
+   {
+    $IN->close();
+    undef $IN;
+    next;
+   }
+   $s->add($IN, $OUT);
+   $stmt||=$h->prepare('Insert Into Data(logNo, IP) Values(?, ?)');
+   $stmt->execute($Srv->{No}, $IN->peerhost());
+   %Conn=(Start=>time, Bytes=>[], No=>$h->func('last_insert_rowid'), Last=>time,);
+   next;
+  }
+  my $buff;
+  my $len=sysread($z, $buff, 10240);
+  if(0==$len)
+  {
+   Close2();
+   next;
+  }
+  syswrite($z==$IN?$OUT:$IN, $buff);
+  $Conn{Bytes}[$z==$IN]+=$len;
+  storeConn();
+ }
+}
+
+Close2()	if($IN);
+$s->remove($Acc);
+$Acc->close;
+
+sub storeConn
+{
+ my $Force=shift;
+ return	unless $Force or $Conn{Last}!=time;
+ $add||=$h->prepare("Update Data Set Time=?, iBytes=?, oBytes=? Where No=?");
+ $add->execute(($Conn{Last}=time)-$Conn{Start}, @{$Conn{Bytes}}, $Conn{No});
+}
+
+sub Close2
+{
+# print "Closing connection\n";
+ $s->remove($IN, $OUT);
+ $IN->close;
+ $OUT->close;
+ undef $IN;
+ undef $OUT;
+ storeConn(1);
+}
+
+__END__

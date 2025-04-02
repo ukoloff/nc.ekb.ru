@@ -1,0 +1,131 @@
+#!/usr/bin/perl
+#
+# Авторизация доступа в Интернет
+#
+
+use strict;
+use DBI;		### После перевода всех паролей в AD
+use MIME::Base64;	### эти две строчки можно будет убить
+use Net::LDAP;
+
+$|=1;
+
+my $h;
+my $Base;
+
+while(<>)
+{
+ s/\s+$//;
+ my ($user, $pass)=split /\s/, $_, 2;
+ ldapConnect();
+ print ((A1($user, $pass) and A2(user2dn($user)))? "OK\n" : "ERR\n");
+}
+
+sub ldapConnect()
+{
+ my (@URI, $bindDn, $bindPw);
+ open(F, '/etc/ldap.conf');
+ while(<F>)
+ {
+  if(s/^\s*URI\s+//i)
+  {
+   s/\s+$//;
+   @URI=split;
+  }
+  elsif(s/^\s*BINDDN\s+//i)
+  {
+   s/\s+$//;
+   $bindDn=$_;
+  }
+  elsif(s/^\s*BINDPW\s+//i)
+  {
+   s/\s+$//;
+   $bindPw=$_;
+  }
+ }
+ close(F);
+ $h=Net::LDAP->new(\@URI, onerror=>undef);
+ $h->bind($bindDn, password=>$bindPw);
+ my $q=$h->search(filter=>"objectClass=*", scope=>'base');
+ $Base=$q->entry(0)->get_value('defaultNamingContext');
+}
+
+sub id2dn
+{
+ my ($id, $class)=@_;
+ $id or return;
+ $id=~s/[\(\*\)\\]/\\$&/g;
+ $class||='Group';
+ my $q=$h->search(base=>$Base, filter=>"(&(objectClass=$class)(sAMAccountName=$id))", attrs=>['1.1']);
+ 1==$q->count()	or return;
+ return $q->entry(0)->dn();
+}
+
+sub group2dn
+{
+ return id2dn(shift);
+}
+
+sub user2dn
+{
+ return id2dn(shift, 'User');
+}
+
+# Authentication: Тот ли, за кого себя выдаёт?
+sub A1
+{
+ my ($u, $pass)=@_;
+ my $udn=user2dn($u);
+ $udn	or return;
+ my $m=$h->bind($udn, password=>$pass);	# Тут надо бы utf8($pass), но ну его. Нефиг дурацкие пароли юзать!
+ return	1	unless $m->code();
+#
+# Проверка также в mysql
+#
+ ldapConnect();				# Восстановим соединение
+ my $dbh=DBI->connect("DBI:mysql:uxm", 'sad', 'dyt9v1qc');
+ my $sth=$dbh->prepare("Select pass From users Where u=?");
+ $sth->execute($u);
+ my $p=$sth->fetchrow_hashref;
+ $p or return 0;
+ $p=$p->{pass};
+ return 0	if crypt($pass, $p)ne $p;
+ $sth=$dbh->prepare("Update users Set smbPass=? Where u=?");
+ $sth->execute(encode_base64($pass), $u);
+ return 1;
+}
+
+# Authorization: Имеет ли право на доступ в Интернет?
+sub A2
+{
+ my $udn=shift;
+ $udn	or return;
+ my $gOn=group2dn('squid');
+ my $gOff=group2dn('#squid');
+ $gOn and $gOff or return;
+ my $On=0;
+ my (%dns, %xdns);
+ while(1)
+ {
+  my $q=$h->search(base=>$udn, scope=>'base', filter=>'objectClass=*', attrs=>['memberOf']);
+  $q=$q->entry(0)	or next;
+  foreach my $dn($q->get_value('memberOf'))
+  {
+   next	if $dns{$dn} or $xdns{$dn};
+   return	if $dn eq $gOff;		# Точно нет доступа, запрещён
+   $On=1	if $dn eq $gOn;   
+   $dns{$dn}=1;
+  }
+  undef $udn;
+  foreach my $x(keys %dns)
+  {
+   delete$dns{$udn=$x}; 
+   $xdns{$x}=1;
+   last;
+  }
+  $udn	or last;
+ }
+ return $On;
+}
+
+#--[EOF]---------------------------------------------------------

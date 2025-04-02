@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+
+use strict;
+
+my $F='/var/tmp/random7';
+
+if(not -t STDOUT)
+{
+ open STDOUT, '>', '/dev/null';
+ open STDERR, '>', '/dev/null';
+ fork and exit;
+}
+
+my $x;
+my $blob;
+open F, '<', '/dev/urandom';
+do{
+sysread F, $x, 2;
+$x=unpack('S', $x);
+}while(!$x);
+sysread F, $blob, $x;
+close F;
+$blob=~tr/\200-\377/\000-\177/;
+$blob=~tr/\000/ /;
+#open F, "-|", "dd if=/dev/urandom bs=$x count=1 2>/dev/null | tr '\\200-\\377' '\\000-\\177' | tr '\\000' ' '";
+#read F, $blob, $x;
+#close F;
+
+if((-s $F)>1000000)
+{
+ open F, '+<', $F;
+ seek F, int(rand((-s $F)-$x)), 0	if (-s $F)>1000000;
+}
+else
+{
+ open F, '>>', $F;
+}
+print F $blob;
+close F;
+
+__END__

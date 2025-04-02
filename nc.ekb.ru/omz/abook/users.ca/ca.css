@@ -1,0 +1,35 @@
+Form {
+ border: 1px solid black;
+}
+
+Form A {
+ text-decoration: none;
+}
+
+Form Div#whenEmpty {
+ background: #B0D0F0;
+}
+
+Form Div#whenFiltering {
+ display: none;
+ text-align: right;
+ background: #A0C0F0;
+ border-top: 1px solid black;
+}
+
+Form Div#whenFiltering A {
+ margin-top: 0.5ex;
+ float: left;
+}
+
+#EmptyFilter {
+ display: none;
+}
+
+TD Div.crtLink {
+ display: none;
+ position: absolute;
+ border: 3px double;
+ background: silver;
+ text-align: left;
+}

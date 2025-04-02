@@ -1,0 +1,29 @@
+Div.winPath	{
+    text-align:	left;
+    font-size:	90%;
+    background:	#A0C0F0;
+}
+
+Span.Ajax {
+    font-size: 87%;
+    margin-left: 1ex;
+    color: navy;
+}
+
+Div#Notify {
+    display: none;
+    font-size: 75%;
+    margin-left: 2em;
+}
+
+Div#sumPopup {
+    display: none;
+    position: absolute;
+    background: #A0F0C0;
+    x-border: 1px dotted gray;
+}
+
+Div#sumPopup TD {
+ font-size: 80%;
+ white-space: nowrap;
+}

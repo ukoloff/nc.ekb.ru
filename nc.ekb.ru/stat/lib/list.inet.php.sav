@@ -1,0 +1,68 @@
+<Script Src='stat.js'></Script>
+<?
+$CFG->sort['b']=Array('name'=>'Мб', 'field'=>'b', 'rev'=>1, 'title'=>'Трафик Интернет за месяц');
+$CFG->sort['q']=Array('name'=>'Квота', 'field'=>'limitMb', 'title'=>'Ежемесячная квота, Мб');
+$CFG->sort['r']=Array('name'=>'%', 'field'=>'rate', 'title'=>'Процент расхода месячной квоты');
+$CFG->sort['o']['name']='Отдел';
+$CFG->sort['n']['name']='Пользователь';
+
+if(!$CFG->odn) $extraUsers=Array('<'=>'Экском;Входящий трафик', '<UTK'=>'УТК;Входящий трафик');
+
+$q=mysql_query("Select uTotals.u, b, limitMb From uTotals Left Join limits Using(u) Where `When`={$CFG->params->m}");
+
+unset($Items);
+while($r=mysql_fetch_object($q)):
+ if($XU=$extraUsers[$r->u]):
+  list($xName, $xDept)=explode(';', $XU);
+  $x=null;
+  $x->isA='u';
+  $x->id=$r->u;
+  $x->name=$xName;
+  $x->ou=$xDept;
+  $x->b=$r->b; 
+  $extraObj[]=$x;
+  continue;
+ endif;
+ $x=user2obj($r->u);
+ if(!$x) continue;
+ if($x->limitMb=$r->limitMb)
+  $x->rate=round($r->b/$r->limitMb/1024/1024*100);
+ do{
+  $x->b+=$r->b;
+  if($x->Added) continue;
+  $x->Added=1;
+  $Items[]=&$x;
+ }while($x=&obj2parent($x));
+endwhile;
+
+sortArray($Items);
+if($extraObj):
+ sortArray($extraObj);
+ foreach($extraObj as $x) $Items[]=$x;
+endif;
+echo "<Div id='Data'>";
+sortedHeader('nobqr');
+foreach($Items as $x):
+ echoStatObject($x);
+ echo '<TD>', n2M($x->b);
+ echo '</TD><TD>', $x->limitMb ? $x->limitMb : "<BR />";
+ echo "</TD><TD>", $x->rate;
+ echo "<BR /></TD></TR>\n";
+endforeach;
+sortedFooter();
+?>
+<Div Align='Left'>&raquo;<A hRef='#' onClick='HideLinks(); return false;'>Скрыть</A> все ссылки<BR />
+&raquo;Суммарные значения "Итого" и "Входящий трафик" и не должны совпадать
+</Div>
+</Div>
+
+<H3>Все данные</H3>
+
+<?
+LoadLib('summary');
+$X=sqlGet("Select min(`When`) Min, max(`When`) Max From uTotals");
+$i=new monthIterator($X->Min, $X->Max); 
+while($i->Advance())
+ if($m=$i->m())
+  echo '<Center><A Class="X" hRef="./', hRef('m', $m), "\">&raquo;</A></Center>";
+?>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Date>2012-09-03T16:20:41.9356073</Date>
+    <Author>OMZGLOBAL\stas</Author>
+  </RegistrationInfo>
+  <Triggers>
+    <EventTrigger>
+      <Enabled>true</Enabled>
+      <Subscription>&lt;QueryList&gt;&lt;Query Id="0" Path="Microsoft-Windows-TerminalServices-Gateway/Operational"&gt;&lt;Select Path="Microsoft-Windows-TerminalServices-Gateway/Operational"&gt;*[System[(EventID=302 or EventID=303)]]&lt;/Select&gt;&lt;/Query&gt;&lt;/QueryList&gt;</Subscription>
+      <ValueQueries>
+        <Value name="ID">Event/System/EventID</Value>
+        <Value name="IP">Event/UserData/EventInfo/IpAddress</Value>
+        <Value name="User">Event/UserData/EventInfo/Username</Value>
+        <Value name="Host">Event/UserData/EventInfo/Resource</Value>
+        <Value name="Time">Event/UserData/EventInfo/SessionDuration</Value>
+        <Value name="bIn">Event/UserData/EventInfo/BytesReceived</Value>
+        <Value name="bOut">Event/UserData/EventInfo/BytesTransfered</Value>
+      </ValueQueries>
+    </EventTrigger>
+  </Triggers>
+  <Principals>
+    <Principal id="Author">
+      <UserId>S-1-5-18</UserId>
+      <RunLevel>LeastPrivilege</RunLevel>
+    </Principal>
+  </Principals>
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>true</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>true</StopIfGoingOnBatteries>
+    <AllowHardTerminate>true</AllowHardTerminate>
+    <StartWhenAvailable>false</StartWhenAvailable>
+    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>
+    <IdleSettings>
+      <StopOnIdleEnd>true</StopOnIdleEnd>
+      <RestartOnIdle>false</RestartOnIdle>
+    </IdleSettings>
+    <AllowStartOnDemand>true</AllowStartOnDemand>
+    <Enabled>true</Enabled>
+    <Hidden>false</Hidden>
+    <RunOnlyIfIdle>false</RunOnlyIfIdle>
+    <WakeToRun>false</WakeToRun>
+    <ExecutionTimeLimit>P3D</ExecutionTimeLimit>
+    <Priority>7</Priority>
+  </Settings>
+  <Actions Context="Author">
+    <Exec>
+      <Command>c:\temp\A.bat</Command>
+      <Arguments>id:$(ID) u:$(User) IP:$(IP) h:$(Host) t:$(Time) in:$(bIn) out:$(bOut)</Arguments>
+    </Exec>
+  </Actions>
+</Task>

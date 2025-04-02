@@ -1,0 +1,1 @@
+<? loadLib($CFG->params->i?'one':'list'); ?>

@@ -1,0 +1,17 @@
+.ufn {
+    text-align: left;
+    font-size: 110%;
+    background: #A0C0F0;
+}
+
+.ufn A {
+    text-decoration: none;
+}
+
+FORM {
+    margin: 0;
+}
+
+UL {
+    margin: 0.5ex 1.5em;
+}

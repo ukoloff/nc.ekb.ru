@@ -1,0 +1,3 @@
+<?
+Header('Location: /help/dial/');
+?>

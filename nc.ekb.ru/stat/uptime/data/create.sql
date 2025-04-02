@@ -1,0 +1,1 @@
+/var/www/virts/ssl:ekb.ru/stat/uptime/setup/lib/create.sql

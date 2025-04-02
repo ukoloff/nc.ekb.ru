@@ -1,0 +1,49 @@
+Table.Summary TH {
+    font-size: 75%;
+    background: #DDDDDD;
+}
+
+Table.Summary TH.Corner {
+    border: none;
+}
+
+Table.Summary TD {
+    text-align: right;
+}
+
+Table.Summary A.X {
+    text-decoration: none;
+}
+
+TD.Now {
+    background: lime;
+}
+
+TD.Select {
+    background: #C0A0F0;
+}
+
+Div.Bar {
+    background: navy;
+}
+
+Table.Bar {
+    background: navy;
+}
+
+Table.MailMonth {
+    width: 100%;
+}
+
+Table.MailMonth TD{
+    padding: 0 0.5ex;
+    x-text-align: right;
+}
+
+Table.MailMonth TD.Upper {
+    border-bottom: 1 dotted black;
+}
+
+TR.Dept {
+    background: #DDDDDD;
+}

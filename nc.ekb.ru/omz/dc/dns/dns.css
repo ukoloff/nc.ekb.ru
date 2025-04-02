@@ -1,0 +1,22 @@
+A.Q	{
+    background: silver;
+    border: solid 1px black;
+    font-family: monospace;
+    text-decoration: none;
+    font-size: 70%;
+    padding: 0 0.9ex;
+}
+Span.RR	{
+    x-background: #CCCCFF;
+    color: green;
+    margin: 0 1ex;
+    padding: 0 0.5ex;
+}
+Div.subTree	{
+    x-display: none;
+    padding-left: 1.6em;
+}
+FieldSet	{
+    padding: 0.2ex;
+}
+

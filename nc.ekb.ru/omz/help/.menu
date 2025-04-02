@@ -1,0 +1,11 @@
+[/omz/help/OpenVPN/]
+text=OpenVPN
+if=@openVPN
+
+[/omz/help/TSG/]
+text=Шлюз терминала
+if=@RDP
+
+[/omz/help/VNC/]
+text=Настройка vnc:
+if=@Support | @"#modifyDIT"

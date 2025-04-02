@@ -1,0 +1,19 @@
+REGEDIT4
+
+[HKEY_CURRENT_USER\Software\Microsoft\Internet Explorer\Main]
+"Start Page"="http://net.ekb.ru"
+"Search Page"="http://uxm/search/"
+"Search Bar"="http://uxm/search/ie4.html"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings]
+"AutoConfigURL"="http://wpad/wpad.dat"
+"ProxyHttp1.1"=dword:00000001
+
+[HKEY_CURRENT_USER\Software\Microsoft\Internet Explorer\SearchUrl]
+@="http://uxm/search/?%s"
+" "="+"
+"&"="%26"
+"+"="%2B"
+"#"="%23"
+"?"="%3F"
+"="="%3D"
